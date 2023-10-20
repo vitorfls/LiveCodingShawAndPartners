@@ -67,13 +67,13 @@ public class Table
     public Dictionary<string, object> Insert(Dictionary<string, object> values)
     {
 
-        // Valida se os values estão dentro do schema
+        // Validar se os values estão dentro do schema
         if (!ValidateColumns(values))
         {
             return null;
         }
 
-        // Crie um registro vazio com valores padrão baseados nas especificações das colunas
+        // Criar um registro vazio com valores padrão baseados nas especificações das colunas
         Dictionary<string, object> emptyRecord = CreateCloneRecord();
 
         foreach (var kvp in values)
@@ -164,10 +164,9 @@ public class Table
     {
         return _rows;
     }
-
     public Dictionary<string, object> CreateCloneRecord()
     {
-        // Create a new record with default values based on column specifications
+        // Criar um novo registro com valores padrão com base nas especificações da coluna
         Dictionary<string, object> record = new Dictionary<string, object>();
 
         foreach (var column in _columns)
@@ -177,124 +176,114 @@ public class Table
 
             if (columnSpec.Type == "integer")
             {
-                // Set default value for integer columns
+                // Definir o valor padrão para colunas do tipo inteiro
                 record[columnName] = 0;
 
                 if (columnSpec.AutoIncrement)
                 {
-                    // If it's an auto-increment column
+                    // Se for AutoIncrement
                     if (columnSpec.PrimaryKey)
                     {
-                        // If it's a primary key with auto-increment
+                        // Se for uma chave primária AutoIncrement
                         _id = _id + 1;
-                        record[columnName] = _id; // Default value for PrimaryKey auto-increment
+                        record[columnName] = _id; // Valor padrão para chave primária com auto-incremento
                     }
                 }
             }
             else if (columnSpec.Type == "text")
             {
-                // Set default value for text columns
+                // Definir o valor padrão para colunas texto
                 record[columnName] = string.Empty;
             }
-            // You can add additional conditions for other data types as needed
+            // Você pode adicionar condições adicionais para outros tipos de dados, conforme necessário
         }
 
         return record;
     }
 
+
     private bool ValidateColumns(Dictionary<string, object> input)
     {
-
-        // First Check if each column exists in the schema
+        // Validar schema
         foreach (var pvc in input)
         {
             if (!_columns.ContainsKey(pvc.Key))
             {
-                Console.WriteLine($"{pvc.Key} does not exist on schema.");
+                Console.WriteLine($"{pvc.Key} doesnt exists on schema");
                 return false;
             }
         }
 
-        // All validations passed
+        // Todas as validações foram bem-sucedidas
         return true;
     }
+
 
     private bool ValidateRow(Dictionary<string, object> input)
     {
 
-        // First Check if each column exists in the schema
-        foreach (var pvc in input)
-        {
-            if (!_columns.ContainsKey(pvc.Key))
-            {
-                Console.WriteLine($"'{pvc.Key}' does not exist on schema.");
-                return false;
-            }
-        }
-
-        // Second Validate each column's value against its specifications
+        // Validar o valor de cada coluna em relação às suas especificações
         foreach (var col in _columns)
         {
-            string columnName = col.Key; // Get the column's identifier
-            Column columnSpec = _columns[columnName]; // Get the column's specifications (not null, type, etc)
+            string columnName = col.Key; // Obter o identificador da coluna
+            Column columnSpec = _columns[columnName]; // Obter as especificações da coluna (not null, tipo, etc)
 
             if (!ValidateRowValue(columnName, input, columnSpec))
             {
-                // Value does not match the column specifications
+                // O valor não corresponde às especificações da coluna
                 return false;
             }
         }
 
-        // All validations passed
+        // Todas as validações foram bem-sucedidas
         return true;
     }
 
+
     private bool ValidateRowValue(string columnName, Dictionary<string, object> values, Column columnSpec)
     {
-
-        // The column is provided; filter only by column name
+        // A coluna foi fornecida; 
         string kpv = values[columnName].ToString();
 
-        // Check if the column is empty
+        // Verificar se a coluna está vazia
         if (String.IsNullOrEmpty(kpv))
         {
-            // If the column is specified as not null, it's invalid
+            // Se a coluna for especificada como not null, ela é inválida
             if (columnSpec.NotNull)
             {
                 Console.WriteLine($"{columnName} cannot be null");
                 return false;
             }
-
         }
         else
         {
             if (columnSpec.Type == "integer")
             {
-                // Try parsing the value as an integer
+                // Tente fazer o parsing do valor como int
                 if (!int.TryParse(kpv, out int intValue))
                 {
-                    // The string doesn't represent an integer, and it's invalid
-                    Console.WriteLine($"{columnName} must be int");
+                    // A string não representa um int
+                    Console.WriteLine($"{columnName} must be a int");
                     return false;
                 }
             }
 
             if (columnSpec.Type == "text")
             {
-                // Try parsing the value as an integer
+                // Tente fazer o parsing do valor como um inteiro
                 if (int.TryParse(kpv, out int intValue))
                 {
-                    // The string represents an integer, and it's invalid as it should be text
+                    // A string representa um inteiro, e é inválida, pois deveria ser text
                     Console.WriteLine($"{columnName} must be a string");
                     return false;
                 }
             }
-
         }
 
-        // All validations passed
+        // Todas as validações foram bem-sucedidas
         return true;
     }
+
 
     public int GetIndexById(int id)
     {
