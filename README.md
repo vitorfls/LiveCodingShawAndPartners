@@ -1,4 +1,7 @@
-# Live Coding Challenge - Shaw And Partners - ORM and User Classes
+# Live Coding Challenge - ORM and User Classes
+
+## Shaw And Partner
+A C# project that demonstrates ORM concepts and data validation. Developed by Vitor Lopes for the Shaw And Partners IT Recruiter.
 
 ## Developed by Vitor Lopes
 
